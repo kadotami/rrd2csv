@@ -2,7 +2,7 @@
 
 ## About 
 
-This is convert script for rrd file to csv.
+This is cheap convert script for rrd file to csv.
 
 ## Requirements
 

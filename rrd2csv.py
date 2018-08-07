@@ -7,6 +7,17 @@ def rrd_fetch(file, cf):
     last = str(rrdtool.last(file))
     return rrdtool.fetch(file, cf, "-s", first, "-e", last)
 
+def convert_single_file(file, cf):
+    rrd_data = rrd_fetch(args.file, args.cf)
+    first, end, step = rrd_data[0]
+    times = range(first, end, step)
+    head = "time, " + ', '.join(rrd_data[1])    
+    print(head)
+
+    for i, time in enumerate(times):
+        row = str(time)+ ', '  +  ', '.join(tuple(map(str, rrd_data[2][i])))
+        print(row)
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,19 +25,4 @@ if __name__ == '__main__':
     parser.add_argument("cf", help="'AVERAGE' or 'MIN' or 'MAX'")
     args = parser.parse_args()
 
-    result = rrd_fetch(args.file, args.cf)
-    times = range(result[0][0],result[0][1],result[0][2])
-    head = "time"
-    for val in result[1]:
-        head = head + ", " + val
-    
-    print(head)
-
-    for i, time in enumerate(times):
-        row = time
-        for val in result[2][i]:
-            row = str(row) + ", " + str(val)
-        print(row)
-        
-        
-        
+    convert_single_file(args.file, args.cf)
