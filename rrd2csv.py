@@ -1,6 +1,9 @@
 import rrdtool
 import argparse
 import time
+import glob
+import os
+from pathlib import Path
 
 def rrd_fetch(file, cf):
     first = str(rrdtool.first(file))
@@ -8,7 +11,7 @@ def rrd_fetch(file, cf):
     return rrdtool.fetch(file, cf, "-s", first, "-e", last)
 
 def convert_single_file(file, cf):
-    rrd_data = rrd_fetch(args.file, args.cf)
+    rrd_data = rrd_fetch(file, cf)
     first, end, step = rrd_data[0]
     times = range(first, end, step)
     head = "time, " + ', '.join(rrd_data[1])    
@@ -21,8 +24,13 @@ def convert_single_file(file, cf):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("file", help="file path")
-    parser.add_argument("cf", help="'AVERAGE' or 'MIN' or 'MAX'")
+    parser.add_argument("path", help="file or directory path")
+    parser.add_argument("cf", help="'AVERAGE' or 'MIN' or 'MAX' or 'ALL'. ALL is 3 types ('AVERAGE' and 'MIN' and 'MAX')")
     args = parser.parse_args()
 
-    convert_single_file(args.file, args.cf)
+    if(os.path.isdir(args.path)):
+        files = glob.glob(args.path + "/**/*.rrd", recursive=True)
+        for file in files:
+            print(file)
+    else:
+        convert_single_file(args.path, args.cf)
