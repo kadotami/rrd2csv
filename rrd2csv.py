@@ -14,8 +14,12 @@ def convert_single_file(file, cf):
     rrd_data = rrd_fetch(file, cf)
     first, end, step = rrd_data[0]
     times = range(first, end, step)
-    head = "time, " + ', '.join(rrd_data[1])    
-    print(head)
+    head = "time, " + ', '.join(rrd_data[1])
+
+    write_file_name = ('.').join(file.split('.')[:-1]) + '.csv'
+
+    with open(write_file_name, mode='w') as f:
+        f.write(head)
 
     for i, time in enumerate(times):
         row = str(time)+ ', '  +  ', '.join(tuple(map(str, rrd_data[2][i])))

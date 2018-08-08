@@ -20,3 +20,10 @@ pip install rrdtool
 ```
 python rrd2csv.py sample.rrd AVERAGE
 ```
+
+### convert all files in a directory
+
+```
+python rrd2csv.py /path/to/dir AVERAGE
+```
+
