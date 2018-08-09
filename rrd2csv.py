@@ -3,7 +3,7 @@ import argparse
 import time
 import glob
 import os
-from pathlib import Path
+import sys
 
 def rrd_fetch(file, cf):
     first = str(rrdtool.first(file))
@@ -39,7 +39,7 @@ def check_cf(cf):
     elif cf == "ALL":
         pass
     else:
-        raise ValueError("cf is invalid. select 'AVERAGE' or 'MIN' or 'MAX' or 'ALL'")
+        sys.exit("cf is invalid. select 'AVERAGE' or 'MIN' or 'MAX' or 'ALL'")
     return cf_list
         
 
