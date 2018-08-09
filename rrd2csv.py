@@ -10,10 +10,12 @@ def rrd_fetch(file, cf):
     last = str(rrdtool.last(file))
     return rrdtool.fetch(file, cf, "-s", first, "-e", last)
 
-def write_file_path(file, cf, path=''):
-    write_file_name = ('.').join(file.split('.')[:-1]) + '_' + cf + '.csv' 
-    if path != '':
-        write_file_name = path + '/csv/' + write_file_name.split(path)[1]
+def create_write_file_name(file, cf, path=''):
+    if path == '':
+        write_file_name = ('.').join(file.split('.')[:-1]) + '_' + cf.lower() + '.csv' 
+    else:
+        write_file_name = path + '/csv/' + cf.lower() + '/' + ('.').join(file.split('.')[:-1]).split(path)[1] + '.csv'
+    
     write_file_name = write_file_name.replace('//', '/')
     return  write_file_name
 
@@ -30,6 +32,17 @@ def convert_single_file(rrd_file, cf, write_file):
         for line in lines:
             f.write('%s\n' % line)
 
+def check_cf(cf):
+    cf_list = ["AVERAGE", "MAX", "MIN"]
+    if cf in cf_list:
+        cf_list = [cf]
+    elif cf == "ALL":
+        pass
+    else:
+        raise ValueError("cf is invalid. select 'AVERAGE' or 'MIN' or 'MAX' or 'ALL'")
+    return cf_list
+        
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("path", help="file or directory path")
@@ -38,12 +51,16 @@ if __name__ == '__main__':
     path = args.path
     cf = args.cf
 
+    cf_list = check_cf(cf)
+
     if(os.path.isdir(path)):
-        os.mkdir((path + '/csv').replace('//','/'))
         files = glob.glob(path + "/**/*.rrd", recursive=True)
         for file in files:
-            write_file = write_file_path(file, cf, path)
-            convert_single_file(file, cf, write_file)
+            for cf in cf_list:
+                write_file = create_write_file_name(file, cf, path)
+                os.makedirs(('/').join(write_file.split('/')[:-1]), exist_ok = True)
+                convert_single_file(file, cf, write_file)
     else:
-        write_file = write_file_path(path, cf)
-        convert_single_file(path, cf, write_file)
+        for cf in cf_list:
+            write_file = create_write_file_name(path, cf)
+            convert_single_file(path, cf, write_file)
