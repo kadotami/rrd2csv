@@ -15,6 +15,10 @@ pip install rrdtool
 
 ## Usage
 
+python rrd2csv.py file_path consolidation_function(cf)
+
+cf: 'AVERAGE' or 'MIN' or 'MAX' or 'ALL'
+
 ### convert single file
 
 ```
